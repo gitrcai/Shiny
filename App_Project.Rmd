@@ -1,0 +1,88 @@
+---
+title: "Shiny Application and Reproducible Pitch"
+author: "Rong Cai"
+date: "December 2, 2016"
+output: ioslides_presentation
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Intruduction of Project
+
+In this progect, the R Markdown presentation is used for my presentation. The data set, mtcars, is use for the analysis. I use the linear regression model which created in my regression course project. 
+
+This model include dependent variable MPG (miles per gallon), predictors am (automatic or manual transmission), cyl (car cylinder numbers), hp (car horse power), and wt (car weight in 1000lb). I use sliders for continue variables (hp and wt) and pull down menu for categorical variables (am and cyl) for prediction needs. 
+
+The red ponits on 3D graph are original data points from data set and the blue point is the MPG prediction for giving predictors.
+
+## User instruction
+
+- Select Car Weight by moving the first slider 
+- Select car horse power by moving the second slider
+- select car type from the first pull down menu
+- select car cylinder from the second pull down menu
+- submit your selection by pushing the submit button
+- watch the blue predicted point moving 
+
+## Data set of mtcars 
+
+```{r cars, echo = FALSE}
+##The data set
+data(mtcars)
+str(mtcars)
+```
+
+## Prodict Miles per Gallon
+
+```{r pressure, warning=FALSE}
+library(shiny)
+library(knitr)
+library(ggplot2)
+library(scatterplot3d)
+ui <- shinyUI(fluidPage(
+    titlePanel("Predictors"),
+    sidebarLayout(
+    sidebarPanel(
+       sliderInput("weight",
+                   "Weights in 1000lb:",
+                   min = 1,
+                   max = 6,
+                   value = 5),
+       sliderInput("hp",
+                   "Gross horsepower:",
+                   min=50,
+                   max=350,
+                   value=100),
+       selectInput("type", "Car type:", choices=c("Automatic","Manual")),
+       selectInput("cylinder", "Number of cylinders:", choices=c("4","6","8")),
+       submitButton("Submit")
+    ),
+  mainPanel(
+       plotOutput("distPlot")
+    )
+  )
+))
+server <- shinyServer(function(input, output) {
+  output$distPlot <- renderPlot({
+    dat <- data(mtcars)
+    mtcars$am   <- factor(mtcars$am,labels=c("Automatic","Manual"))
+    mtcars$cyl  <- factor(mtcars$cyl)
+    fit <- lm(mpg~am+cyl+hp+wt, data=mtcars)
+    a <- ifelse(input$type=="Automatic", 0, 1)
+    b <- ifelse(input$cylinder==6, 1, 0)
+    c <- ifelse(input$cylinder==8, 1, 0)
+    p=fit$coefficients[1]+a*fit$coefficients[2]+b*fit$coefficients[3]+c*fit$coefficients[4]
+      +input$hp*fit$coefficients[5]+input$weight*fit$coefficients[6]
+    x <- as.numeric(input$weight)
+    y <- as.numeric(input$hp)
+    z <- as.numeric(p)
+    g1 <- scatterplot3d(mtcars$wt,mtcars$hp,mtcars$mpg, main="MPG Prediction (Blue point) Due to Change of Predictors", pch=16, color="red", xlab="weight in 1000lb", ylab="horse power", zlab="miles per gallon")
+    g1$points3d(x, y, z, pch=16, col="blue", cex=3)
+  })
+})
+shinyApp(ui, server)
+```
+
