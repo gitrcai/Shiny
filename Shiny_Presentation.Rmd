@@ -1,0 +1,43 @@
+---
+title: "Shiny Application and Reproducible Pitch"
+author: "Rong Cai"
+date: "December 6, 2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Intruduction of Project
+
+In this progect, the R Markdown presentation is used for my presentation. The data set, mtcars, is use for the analysis. I use the linear regression model which created in my regression course project. 
+
+This model include dependent variable MPG (miles per gallon), predictors am (automatic or manual transmission), cyl (car cylinder numbers), hp (car horse power), and wt (car weight in 1000lb). I use sliders for continue variables (hp and wt) and pull down menu for categorical variables (am and cyl) for prediction needs. 
+
+The red ponits on 3D graph are original data points from data set and the blue point is the MPG prediction for giving predictors.
+
+## User instruction
+
+- Select Car Weight by moving the first slider 
+- Select car horse power by moving the second slider
+- select car type from the first pull down menu
+- select car cylinder from the second pull down menu
+- submit your selection by pushing the submit button
+- watch the blue predicted point moving 
+
+## Data set of mtcars 
+
+```{r cars, echo = FALSE}
+##The data set
+data(mtcars)
+str(mtcars)
+```
+
+## 
+```{r, warning=FALSE, out.width = "1000px"}
+library(png)
+library(grid)
+img <- readPNG("App.png")
+ grid.raster(img)
+```
